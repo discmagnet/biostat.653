@@ -25,7 +25,7 @@ hw1 <- mutate(hw1, age_sq = age^2)
 
 model_3 <- lm(arm ~ wt + sex + age + age_sq, data = hw1)
 data_3 <- data.frame(cbind(model_3$residuals,hw1$wt,hw1$sex))
-plot03 <- ggplot(data = data_3, aes(x = data_3$X2, y = data_3$X1)) +
+plot03 <- ggplot(data = data_3, aes(x = X2, y = X1)) +
   geom_point() +
   geom_smooth() +
   ylab("Residuals") +
@@ -34,4 +34,3 @@ plot03
 
 plot04 <- plot03 + facet_grid(. ~ X3)
 plot04
-
