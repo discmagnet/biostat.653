@@ -78,3 +78,79 @@ plot01
 plot02 <- plot(rho,eB1,col="red")
 plot02 <- lines(rho,eB1,col="red")
 plot02
+
+# --------------------------------------------------------------
+
+set.seed(20181001)
+m <- 40            # 40 subjects.
+n <- 3             # 3 measurements per subject.
+sigma_squared <- 4 # variance.
+rho <- 0.5         # true correlation.
+V0 <- matrix(c(1,     rho, rho^2,
+               rho,   1,   rho,
+               rho^2, rho, 1),
+             nrow=3,ncol=3,byrow=TRUE) 
+
+# Create the design matrix, X
+trt_sequence <- expand.grid(c(0, 1), c(0, 1), c(0, 1))
+X <- cbind(1, c(t(trt_sequence)))
+X <- rbind(X,X,X,X,X)
+beta0 <- 1
+beta1 <- 2
+mu_all <- X %*% matrix(c(beta0, beta1), ncol = 1)
+
+WLSv1 <- vector()
+WLSv2 <- vector()
+WLSv3 <- vector()
+NREP <- 1000
+for(k in 1:NREP){
+  # Generate random Gaussian variables
+  Y_vec <- vector()
+  for (i in 1:(n*m)){
+    Y_vec[i] <- rnorm(1,mu_all[i],sqrt(sigma_squared))
+  }
+  Y_mat <- matrix(Y_vec,nrow = 8,ncol = 3,byrow = T)
+  
+  # Determine Y and V (true variance)
+  # Copied and pasted from class example
+  res_svd <- svd(V0)
+  V0_sqrt <- res_svd$u%*%diag(sqrt(res_svd$d))%*%t(res_svd$v)
+  Y_mat_correlated <- Y_mat%*%V0_sqrt
+  Y <- c(Y_mat_correlated)
+  I_m_by_m <-  diag(rep(1,m))
+  V <- I_m_by_m%x%V0
+  
+  # Weight Matrix 1:
+  rho12 <- 0.5
+  rho13 <- 0.8
+  rho23 <- 0.2
+  V1 <- matrix(c(1,rho12,rho13,
+                 rho12,1,rho23,
+                 rho13,rho23,1),
+               nrow=3,ncol=3,byrow=TRUE)
+  
+  W1 <- solve(I_m_by_m%x%V1)
+  
+  # Weight Matrix 2:
+  
+  W2 <- diag(n*m) # inverse of identity is still identity
+  
+  # Weight Matrix 3:
+  rho <- 0.5
+  V3 <- matrix(c(1,     rho, rho^2,
+                 rho,   1,   rho,
+                 rho^2, rho, 1),
+               nrow=3,ncol=3,byrow=TRUE)
+  
+  W3 <- solve(I_m_by_m%x%V3)
+  
+  # Calculate Variance Estimates
+  
+  WLSv1[k] <- var_wls(X,W1,V,sigma_squared)
+  WLSv2[k] <- var_wls(X,W2,V,sigma_squared)
+  WLSv3[k] <- var_wls(X,W3,V,sigma_squared)
+}
+
+m1 <- mean(WLSv1)
+m2 <- mean(WLSv2)
+m3 <- mean(WLSv3)
