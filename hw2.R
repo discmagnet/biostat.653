@@ -1,4 +1,6 @@
+# --------------------------------------------------------------
 # Problem 2
+
 library(tidyverse)
 library(reshape2)
 library(foreign)
@@ -80,6 +82,7 @@ plot02 <- lines(rho,eB1,col="red")
 plot02
 
 # --------------------------------------------------------------
+# Problem 3
 
 set.seed(20181001)
 m <- 40            # 40 subjects.
@@ -102,6 +105,9 @@ mu_all <- X %*% matrix(c(beta0, beta1), ncol = 1)
 WLSv1 <- vector()
 WLSv2 <- vector()
 WLSv3 <- vector()
+WLSv4 <- vector()
+WLSv5 <- vector()
+WLSv6 <- vector()
 NREP <- 1000
 for(k in 1:NREP){
   # Generate random Gaussian variables
@@ -109,7 +115,7 @@ for(k in 1:NREP){
   for (i in 1:(n*m)){
     Y_vec[i] <- rnorm(1,mu_all[i],sqrt(sigma_squared))
   }
-  Y_mat <- matrix(Y_vec,nrow = 8,ncol = 3,byrow = T)
+  Y_mat <- matrix(Y_vec,nrow = m,ncol = n,byrow = T)
   
   # Determine Y and V (true variance)
   # Copied and pasted from class example
@@ -118,7 +124,8 @@ for(k in 1:NREP){
   Y_mat_correlated <- Y_mat%*%V0_sqrt
   Y <- c(Y_mat_correlated)
   I_m_by_m <-  diag(rep(1,m))
-  V <- I_m_by_m%x%V0
+  V_e <- var(Y_mat_correlated)
+  V_emp <- I_m_by_m%x%V_e
   
   # Weight Matrix 1:
   rho12 <- 0.5
@@ -144,13 +151,29 @@ for(k in 1:NREP){
   
   W3 <- solve(I_m_by_m%x%V3)
   
-  # Calculate Variance Estimates
-  
-  WLSv1[k] <- var_wls(X,W1,V,sigma_squared)
-  WLSv2[k] <- var_wls(X,W2,V,sigma_squared)
-  WLSv3[k] <- var_wls(X,W3,V,sigma_squared)
+  # Calculate WLS Estimates
+  WLSv1[k] <- wls(Y,X,W1)[1,1]
+  WLSv2[k] <- wls(Y,X,W2)[1,1]
+  WLSv3[k] <- wls(Y,X,W3)[1,1]
+  WLSv4[k] <- wls(Y,X,W1)[2,1]
+  WLSv5[k] <- wls(Y,X,W2)[2,1]
+  WLSv6[k] <- wls(Y,X,W3)[2,1]
 }
 
-m1 <- mean(WLSv1)
-m2 <- mean(WLSv2)
-m3 <- mean(WLSv3)
+# Sandwich Estimates
+var_w1_b0_emp <- var(WLSv1)
+var_w2_b0_emp <- var(WLSv2)
+var_w3_b0_emp <- var(WLSv3)
+var_w1_b1_emp <- var(WLSv4)
+var_w2_b1_emp <- var(WLSv5)
+var_w3_b1_emp <- var(WLSv6)
+
+V <- I_m_by_m%x%V0
+
+# Theoretical Estimates
+var_w1_b0_real <- var_wls(X,W1,V,sigma_squared)[1,1]
+var_w2_b0_real <- var_wls(X,W2,V,sigma_squared)[1,1]
+var_w3_b0_real <- var_wls(X,W3,V,sigma_squared)[1,1]
+var_w1_b1_real <- var_wls(X,W1,V,sigma_squared)[2,2]
+var_w2_b1_real <- var_wls(X,W2,V,sigma_squared)[2,2]
+var_w3_b1_real <- var_wls(X,W3,V,sigma_squared)[2,2]
