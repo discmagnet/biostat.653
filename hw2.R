@@ -177,3 +177,70 @@ var_w3_b0_real <- var_wls(X,W3,V,sigma_squared)[1,1]
 var_w1_b1_real <- var_wls(X,W1,V,sigma_squared)[2,2]
 var_w2_b1_real <- var_wls(X,W2,V,sigma_squared)[2,2]
 var_w3_b1_real <- var_wls(X,W3,V,sigma_squared)[2,2]
+
+# --------------------------------------------------------------
+# Problem 5
+
+# 5.1.1 - Read the data
+library(haven)
+chol <- read_dta("~/WORKING_DIRECTORIES/biostat.653/cholesterol.dta")
+
+# 5.1.2 - Calculate the sample means, standard deviations,
+#         and variances of the serum cholesterol levels at each
+#         occasion for each treatment group.
+
+grp1 <- subset(chol, group == 1)
+grp2 <- subset(chol, group == 2)
+
+library(dplyr)
+summary01 <- summarise(grp1, mean_y1 = mean(y1,na.rm = T),
+                       mean_y2 = mean(y2,na.rm = T),
+                       mean_y3 = mean(y3,na.rm = T),
+                       mean_y4 = mean(y4,na.rm = T),
+                       mean_y5 = mean(y5,na.rm = T),
+                       var_y1 = var(y1,na.rm = T),
+                       var_y2 = var(y2,na.rm = T),
+                       var_y3 = var(y3,na.rm = T),
+                       var_y4 = var(y4,na.rm = T),
+                       var_y5 = var(y5,na.rm = T),
+                       std_y1 = sqrt(var_y1),
+                       std_y2 = sqrt(var_y2),
+                       std_y3 = sqrt(var_y3),
+                       std_y4 = sqrt(var_y4),
+                       std_y5 = sqrt(var_y5))
+summary02 <- summarise(grp2, mean_y1 = mean(y1,na.rm = T),
+                       mean_y2 = mean(y2,na.rm = T),
+                       mean_y3 = mean(y3,na.rm = T),
+                       mean_y4 = mean(y4,na.rm = T),
+                       mean_y5 = mean(y5,na.rm = T),
+                       var_y1 = var(y1,na.rm = T),
+                       var_y2 = var(y2,na.rm = T),
+                       var_y3 = var(y3,na.rm = T),
+                       var_y4 = var(y4,na.rm = T),
+                       var_y5 = var(y5,na.rm = T),
+                       std_y1 = sqrt(var_y1),
+                       std_y2 = sqrt(var_y2),
+                       std_y3 = sqrt(var_y3),
+                       std_y4 = sqrt(var_y4),
+                       std_y5 = sqrt(var_y5))
+
+# 5.1.3 - On a single graph, construct a time plot that displays
+#         the mean serum cholesterol versus time (in months) for
+#         the two treatment groups. Describe the general chacter-
+#         istics of the time trends for the two groups.
+
+library(ggplot2)
+data513 <- data.frame(rbind(t(summary01[,1:5]),t(summary02[,1:5])),
+                      c(rep(1,5),rep(2,5)),c(0:4,0:4)*6)
+colnames(data513) <- c("mean","group","index")
+plot513 <- ggplot(data = data513,
+                  aes(x = index, y = mean, color = as.factor(group))) +
+  geom_line() +
+  xlab("Follow-up Time (in months)") +
+  ylab("Mean Serum Cholesterol")
+plot513
+
+# 5.1.4 - Put the data in "long" format, with 5 records per subject
+
+library(reshape2)
+data514 <- melt(chol[3:7])
