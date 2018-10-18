@@ -244,3 +244,28 @@ plot513
 
 library(reshape2)
 data514 <- melt(chol[3:7])
+data514 <- mutate(data514, group = rep((c(rep(1,62),rep(2,41))),5))
+data514 <- mutate(data514, id = rep(c(1:103),5))
+data514 <- arrange(data514,id)
+
+# 5.1.5 - Assuming an unstructured covariance matrix, conduct an
+#         analysis of response profiles. Determine whether the patterns
+#         of change over time differ in the two treatment groups.
+
+library(nlme)
+res.gls <- gls(model = value ~ as.factor(variable) * as.factor(group),
+               data = data514,
+               # Covariance structure: unstructured
+               correlation = corSymm(form = ~ as.numeric(as.factor(variable))|id),
+               weights = varIdent(form = ~ 1 | as.factor(variable)),
+               na.action = "na.omit",
+               method = "ML")
+summary(res.gls)
+
+drop1(res.gls, test = "Chisq")
+
+# 5.1.6 - Display the estimated 5 x 5 covariance and correlation matrices
+#         for the five repeated measurements of serum cholesterol.
+
+getVarCov(res.gls) # covariance matrix
+# correlation matrix in summary(res.gls)
