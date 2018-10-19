@@ -152,21 +152,21 @@ for(k in 1:NREP){
   W3 <- solve(I_m_by_m%x%V3)
   
   # Calculate WLS Estimates
-  WLSv1[k] <- wls(Y,X,W1)[1,1]
-  WLSv2[k] <- wls(Y,X,W2)[1,1]
-  WLSv3[k] <- wls(Y,X,W3)[1,1]
-  WLSv4[k] <- wls(Y,X,W1)[2,1]
-  WLSv5[k] <- wls(Y,X,W2)[2,1]
-  WLSv6[k] <- wls(Y,X,W3)[2,1]
+  WLSv1[k] <- var_wls(X,W1,V_emp,1)[1,1]
+  WLSv2[k] <- var_wls(X,W2,V_emp,1)[1,1]
+  WLSv3[k] <- var_wls(X,W3,V_emp,1)[1,1]
+  WLSv4[k] <- var_wls(X,W1,V_emp,1)[2,2]
+  WLSv5[k] <- var_wls(X,W2,V_emp,1)[2,2]
+  WLSv6[k] <- var_wls(X,W3,V_emp,1)[2,2]
 }
 
 # Sandwich Estimates
-var_w1_b0_emp <- var(WLSv1)
-var_w2_b0_emp <- var(WLSv2)
-var_w3_b0_emp <- var(WLSv3)
-var_w1_b1_emp <- var(WLSv4)
-var_w2_b1_emp <- var(WLSv5)
-var_w3_b1_emp <- var(WLSv6)
+var_w1_b0_emp <- mean(WLSv1)
+var_w2_b0_emp <- mean(WLSv2)
+var_w3_b0_emp <- mean(WLSv3)
+var_w1_b1_emp <- mean(WLSv4)
+var_w2_b1_emp <- mean(WLSv5)
+var_w3_b1_emp <- mean(WLSv6)
 
 V <- I_m_by_m%x%V0
 
