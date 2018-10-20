@@ -253,11 +253,11 @@ data514 <- arrange(data514,id)
 #         of change over time differ in the two treatment groups.
 
 library(nlme)
-res.gls <- gls(model = value ~ as.factor(variable) * as.factor(group),
+res.gls <- gls(model = value ~ factor(variable) * factor(group, levels = c(2,1)),
                data = data514,
                # Covariance structure: unstructured
-               correlation = corSymm(form = ~ as.numeric(as.factor(variable))|id),
-               weights = varIdent(form = ~ 1 | as.factor(variable)),
+               correlation = corSymm(form = ~ as.numeric(factor(variable))|id),
+               weights = varIdent(form = ~ 1 | factor(variable)),
                na.action = "na.omit",
                method = "ML")
 summary(res.gls)
