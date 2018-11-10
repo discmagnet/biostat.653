@@ -61,7 +61,6 @@ res.gls <- gls(model = value ~ factor(group)*time,
                weights = varIdent(form = ~ 1 | factor(variable)),
                method = "ML")
 summary(res.gls)
-
 drop1(res.gls, test = "Chisq")
 
 # 6.1.4 - On a single graph, construct a time plot that displays the
@@ -81,16 +80,14 @@ plot614
 
 # 6.1.5 - Based on the results from 6.1.3, what is the estimated
 #         rate of increase in mean weight in the control group?
-res.gls$coefficients[4]
-# 26.18
 #         What is the estimated rate of increase in mean weight in
 #         the thiouracil group (group 2)?
-res.gls$coefficients[4] + res.gls$coefficients[5]
-# 18.65
 #         What is the estimated rate of increase in mean weight in
 #         the thyroxin group (group 3)?
-res.gls$coefficients[4] + res.gls$coefficients[6]
-# 24.76
+res.gls$coefficients[4] # control group (group 1)
+res.gls$coefficients[4] + res.gls$coefficients[5] # thiouracil group (group 2)
+res.gls$coefficients[4] + res.gls$coefficients[6] # thyroxin group (group 3)
+
 
 # 6.1.6 - The study investigators conjectured that there would be an
 #         increase in weight, but that the rate of increase would
@@ -105,5 +102,4 @@ res.gls <- gls(model = value ~ factor(group)*time + factor(group)*knot1,
                weights = varIdent(form = ~ 1 | factor(variable)),
                method = "ML")
 summary(res.gls)
-
 drop1(res.gls, test = "Chisq")
