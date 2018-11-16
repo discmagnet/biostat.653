@@ -58,8 +58,4 @@ korea_Imp <- kNN(korea2,
                  useImputedDist = FALSE)
 
 # The imputed dataset to be used for analysis
-library(foreign)
-write.foreign(korea_Imp,
-              "~/WORKING_DIRECTORIES/biostat.653/korea_Imp.txt",
-              "~/WORKING_DIRECTORIES/biostat.653/korea_Imp.sas",
-              package = "SAS")
+write.csv(korea_Imp[1:25],"~/WORKING_DIRECTORIES/biostat.653/korea_Imp.csv")
