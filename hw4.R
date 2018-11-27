@@ -63,8 +63,17 @@ summary(model02)
 toenail <- read_csv("~/WORKING_DIRECTORIES/biostat.653/toenail-data.csv")
 
 # fit a marginal model for the log odds of MOD or SEV onycholysis
-model03 <- glmer(data = toenail,
-                 family = binomial(link = "logit"),
-                 Y ~ Month + Treatment:Month +
-                   (0+Month|ID))
+library(geepack)
+model03 <- geeglm(data = toenail,
+                  id = ID,
+                  corstr = "exchangeable",
+                  family = binomial(link = "logit"),
+                  Y ~ Month + factor(Treatment):Month)
 summary(model03)
+
+# fit a model with random intercepts
+model04 <- glmer(data = toenail,
+                 family = binomial(link = "logit"),
+                 Y ~ Month + factor(Treatment):Month +
+                   (1|ID))
+summary(model04)
