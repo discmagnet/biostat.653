@@ -74,6 +74,7 @@ summary(model03)
 # fit a model with random intercepts
 model04 <- glmer(data = toenail,
                  family = binomial(link = "logit"),
+                 nAGQ = 50, # sets the # of quadrature points
                  Y ~ Month + factor(Treatment):Month +
-                   (1|ID))
+                   (1|ID)) # random intercept
 summary(model04)
