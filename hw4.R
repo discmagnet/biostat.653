@@ -42,15 +42,32 @@ exercise_long <- mutate(exercise_long, time = rep(2*0:6,37))
 
 # fit a model with random intercepts and slopes
 library(lme4)
-model01 <- lmer(data = exercise_long,
+library(broom)
+model01a <- lmer(data = exercise_long,
                 strength ~ factor(program) + 
                   time + factor(program):time + 
                   (1+time|id))
-summary(model01)
+summary(model01a)
+
+# fit a model with just a random intercept
+model01b <- lmer(data = exercise_long,
+                 strength ~ factor(program) + 
+                   time + factor(program):time + 
+                   (1|id))
+summary(model01b)
+
+# use LRT to test if a model with just random intercepts is adequate
+lik_01a <- glance(model01a)$logLik
+lik_01b <- glance(model01b)$logLik
+LRT_stat <- -2*(lik_01b-lik_01a)
+pchisq(LRT_stat,1,lower.tail = FALSE)
+
 # test the effect of treatment on changes in strength
 drop1(model01, test = "Chisq")
+
 # obtain BLUP for each subject
 ranef(model01)
+
 # fit a simple linear model on subject 24
 model02 <- lm(data = exercise_long,
               subset = (id == 24),
@@ -72,6 +89,7 @@ model03 <- geeglm(data = toenail,
 summary(model03)
 
 # fit a model with random intercepts
+library(lme4)
 model04 <- glmer(data = toenail,
                  family = binomial(link = "logit"),
                  nAGQ = 50, # sets the # of quadrature points
